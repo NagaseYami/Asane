@@ -1,5 +1,6 @@
 package qq
 
+// LifecycleObject 元事件：生命周期
 type LifecycleObject struct {
 	MetaEventType string `json:"meta_event_type"`
 	PostType      string `json:"post_type"`
@@ -8,6 +9,7 @@ type LifecycleObject struct {
 	Time          int64  `json:"time"`
 }
 
+// SendPrivateMessageObject 发送私聊消息
 type SendPrivateMessageObject struct {
 	Action string `json:"action"`
 	Params struct {
@@ -18,6 +20,7 @@ type SendPrivateMessageObject struct {
 	Echo string `json:"echo"`
 }
 
+// RecivePrivateMessageObject 接收私聊消息
 type RecivePrivateMessageObject struct {
 	Font        int32  `json:"font"`
 	Message     string `json:"message"`
@@ -37,6 +40,7 @@ type RecivePrivateMessageObject struct {
 	UserID  int64  `json:"user_id"`
 }
 
+// SendGroupMessageObject 发送群消息
 type SendGroupMessageObject struct {
 	Action string `json:"action"`
 	Params struct {
@@ -47,6 +51,7 @@ type SendGroupMessageObject struct {
 	Echo string `json:"echo"`
 }
 
+// ReciveGroupMessageObject 接收群消息
 type ReciveGroupMessageObject struct {
 	Anonymous struct {
 		ID   int64  `json:"id"`
