@@ -37,13 +37,13 @@ func processIllust(file string, height int, width int) {
 
 	var raw = [][][]uint8{}
 	var err error
-	if height > width && height > 2000 {
-		width = int(2000.0 / float64(height) * float64(width))
-		height = 2000
+	if height > width && height > 1500 {
+		width = int(1500.0 / float64(height) * float64(width))
+		height = 1500
 		raw, err = imgo.ResizeForMatrix(file, width, height)
-	} else if width > height && width > 2000 {
-		height = int(2000.0 / float64(width) * float64(height))
-		width = 2000
+	} else if width > height && width > 1500 {
+		height = int(1500.0 / float64(width) * float64(height))
+		width = 1500
 		raw, err = imgo.ResizeForMatrix(file, width, height)
 	} else {
 		raw = imgo.MustRead(file)
@@ -53,20 +53,26 @@ func processIllust(file string, height int, width int) {
 		log.Fatal(err)
 	}
 
-	triple := imgo.NewRGBAMatrix(height*2, width)
+	triple := imgo.NewRGBAMatrix(height*3, width)
 
 	for i := 0; i < height; i++ {
 		for j := 0; j < width; j++ {
-			triple[i][j][0] = 255 - raw[i][j][0]
-			triple[i][j][1] = 255 - raw[i][j][1]
-			triple[i][j][2] = 255 - raw[i][j][2]
-			triple[i][j][3] = 255
+			triple[i][j] = raw[i-i%10][j-j%10]
 		}
 	}
 
 	for i := 0; i < height; i++ {
 		for j := 0; j < width; j++ {
-			triple[i+height][j] = raw[i][j]
+			triple[i+height][j][0] = 255 - raw[i][j][0]
+			triple[i+height][j][1] = 255 - raw[i][j][1]
+			triple[i+height][j][2] = 255 - raw[i][j][2]
+			triple[i+height][j][3] = 255
+		}
+	}
+
+	for i := 0; i < height; i++ {
+		for j := 0; j < width; j++ {
+			triple[i+height*2][j] = raw[i][j]
 		}
 	}
 
