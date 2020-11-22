@@ -1,15 +1,11 @@
 package main
 
 import (
-	. "Asane/internal/qq"
-	. "Asane/internal/yandere"
-	"encoding/json"
-	"fmt"
+	"Asane/internal/qq"
+	"Asane/internal/services"
 	"os"
 
-	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
-	"github.com/tidwall/gjson"
 )
 
 func main() {
@@ -21,39 +17,6 @@ func main() {
 		return
 	}
 
-	WebSocketServer.HandleGroupMessageFunc("来点色图", sendRandomR18IllustToGroup)
-	WebSocketServer.HandlePrivateMessageFunc("来点色图", sendRandomR18IllustToPrivate)
-	WebSocketServer.Run(addr, os.Getenv("WEBSOCKET_SERVER_TOKEN"))
-}
-
-func sendRandomR18IllustToGroup(conn *websocket.Conn, result gjson.Result) {
-	reciveMsg := &ReciveGroupMessageObject{}
-	json.Unmarshal([]byte(result.Raw), reciveMsg)
-
-	log.Infof("收到来自群%d的用户%d（%s）的随机色图请求", reciveMsg.GroupID, reciveMsg.Sender.UserID, reciveMsg.Sender.Nickname)
-
-	fileURL := YandereClient.GetRandomExplicitPost().FileURL
-
-	sendMsg := SendGroupMessageObject{}
-	sendMsg.Action = "send_group_msg"
-	sendMsg.Params.GroupID = reciveMsg.GroupID
-	sendMsg.Params.Message = fmt.Sprintf("[CQ:image,file=%s]", fileURL)
-
-	WebSocketServer.SendJSON(conn, sendMsg)
-}
-
-func sendRandomR18IllustToPrivate(conn *websocket.Conn, result gjson.Result) {
-	reciveMsg := &RecivePrivateMessageObject{}
-	json.Unmarshal([]byte(result.Raw), reciveMsg)
-
-	log.Infof("收到来自用户%d的随机色图请求", reciveMsg.UserID)
-
-	fileURL := YandereClient.GetRandomExplicitPost().FileURL
-
-	sendMsg := SendPrivateMessageObject{}
-	sendMsg.Action = "send_private_msg"
-	sendMsg.Params.UserID = reciveMsg.UserID
-	sendMsg.Params.Message = fmt.Sprintf("[CQ:image,file=%s]", fileURL)
-
-	WebSocketServer.SendJSON(conn, sendMsg)
+	qq.WebSocketServer.HandleMessage(services.Excute)
+	qq.WebSocketServer.Run(addr, os.Getenv("WEBSOCKET_SERVER_TOKEN"))
 }

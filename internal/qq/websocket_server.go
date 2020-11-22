@@ -12,16 +12,14 @@ import (
 )
 
 type websocketServer struct {
-	token                 string
-	privateMessageHandler map[string]func(*websocket.Conn, gjson.Result)
-	groupMessageHandler   map[string]func(*websocket.Conn, gjson.Result)
+	token          string
+	messageHandler func(*websocket.Conn, IReciveMessageObject)
 }
 
 // WebSocketServer Singleton
 var WebSocketServer = &websocketServer{
-	token:                 os.Getenv("WEBSOCKET_SERVER_TOKEN"),
-	privateMessageHandler: map[string]func(*websocket.Conn, gjson.Result){},
-	groupMessageHandler:   map[string]func(*websocket.Conn, gjson.Result){},
+	token:          os.Getenv("WEBSOCKET_SERVER_TOKEN"),
+	messageHandler: func(*websocket.Conn, IReciveMessageObject) {},
 }
 
 var upgrader = websocket.Upgrader{
@@ -37,20 +35,12 @@ func (s *websocketServer) Run(addr, authToken string) {
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
-func (s *websocketServer) HandlePrivateMessageFunc(keyword string, handler func(*websocket.Conn, gjson.Result)) {
-	s.privateMessageHandler[keyword] = handler
+func (s *websocketServer) HandleMessage(handler func(*websocket.Conn, IReciveMessageObject)) {
+	s.messageHandler = handler
 }
 
-func (s *websocketServer) HandleGroupMessageFunc(keyword string, handler func(*websocket.Conn, gjson.Result)) {
-	s.groupMessageHandler[keyword] = handler
-}
-
-func (s *websocketServer) SendJSON(conn *websocket.Conn, message interface{}) {
-	log.Info("发送Json至CqHttp")
-	b, err := json.Marshal(message)
-	if err != nil {
-		log.Panic(err)
-	}
+func (s *websocketServer) WriteTextMessage(conn *websocket.Conn, b []byte) {
+	log.Info("发送bytes到CqHttp")
 	conn.WriteMessage(websocket.TextMessage, b)
 }
 
@@ -89,29 +79,29 @@ func (s *websocketServer) listenEvent(conn *websocket.Conn) {
 			break
 		}
 		if t == websocket.TextMessage {
-			go s.universalHandler(conn, gjson.ParseBytes(payload))
+			go s.universalRouter(conn, gjson.ParseBytes(payload))
 		}
 	}
 }
 
-func (s *websocketServer) universalHandler(conn *websocket.Conn, json gjson.Result) {
-	switch json.Get("post_type").Str {
+func (s *websocketServer) universalRouter(conn *websocket.Conn, result gjson.Result) {
+	switch result.Get("post_type").Str {
 	case "message":
-		log.Debug(json.String())
-		s.messageHandler(conn, json)
+		log.Debug(result.String())
+		s.messageRouter(conn, result)
 		break
 	case "notice":
 		break
 	case "request":
 		break
 	case "meta_event":
-		s.metaEventHandler(conn, json)
+		s.metaEventRouter(conn, result)
 		break
 	}
 }
 
-func (s *websocketServer) metaEventHandler(conn *websocket.Conn, json gjson.Result) {
-	switch json.Get("meta_event_type").Str {
+func (s *websocketServer) metaEventRouter(conn *websocket.Conn, result gjson.Result) {
+	switch result.Get("meta_event_type").Str {
 	case "lifecycle":
 		break
 	case "heartbeat":
@@ -119,19 +109,21 @@ func (s *websocketServer) metaEventHandler(conn *websocket.Conn, json gjson.Resu
 	}
 }
 
-func (s *websocketServer) messageHandler(conn *websocket.Conn, json gjson.Result) {
-	switch json.Get("message_type").Str {
+func (s *websocketServer) messageRouter(conn *websocket.Conn, result gjson.Result) {
+	switch result.Get("message_type").Str {
 	case "private":
-		fn, exist := s.privateMessageHandler[json.Get("raw_message").Str]
-		if exist {
-			fn(conn, json)
-		}
+		reciveMsg := &RecivePrivateMessageObject{}
+		json.Unmarshal([]byte(result.Raw), reciveMsg)
+		var iMsg IReciveMessageObject
+		iMsg = reciveMsg
+		go s.messageHandler(conn, iMsg)
 		break
 	case "group":
-		fn, exist := s.groupMessageHandler[json.Get("raw_message").Str]
-		if exist {
-			fn(conn, json)
-		}
+		reciveMsg := &ReciveGroupMessageObject{}
+		json.Unmarshal([]byte(result.Raw), reciveMsg)
+		var iMsg IReciveMessageObject
+		iMsg = reciveMsg
+		go s.messageHandler(conn, iMsg)
 		break
 	}
 }

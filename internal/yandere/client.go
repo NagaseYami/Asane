@@ -10,15 +10,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type yandereClient struct{}
+type client struct{}
 
-var YandereURL = url.URL{
+var yandereURL = url.URL{
 	Scheme: "https",
 	Host:   "yande.re",
 }
-var YandereClient = &yandereClient{}
 
-func (c *yandereClient) GetRandomExplicitPost() YanderePostsListResponseObject {
+// Client YandereClient单例
+var Client = &client{}
+
+func (c *client) GetRandomExplicitPost() YanderePostsListResponseObject {
 	log.Info("调用yandere的随机色图api")
 	defer log.Info("成功获取并返回随机色图信息")
 	api := &YanderePostsListApi{

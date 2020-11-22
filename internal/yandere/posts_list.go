@@ -60,7 +60,7 @@ type YanderePostsListApi struct {
 }
 
 func (api *YanderePostsListApi) GetURL() *url.URL {
-	result := YandereURL
+	result := yandereURL
 	result.Path = path.Join(result.Path, "post.json")
 	query := result.Query()
 
