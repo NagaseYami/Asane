@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
@@ -25,7 +26,7 @@ func main() {
 	WebSocketServer.Run(addr, os.Getenv("WEBSOCKET_SERVER_TOKEN"))
 }
 
-func sendRandomR18IllustToGroup(result gjson.Result) {
+func sendRandomR18IllustToGroup(conn *websocket.Conn, result gjson.Result) {
 	reciveMsg := &ReciveGroupMessageObject{}
 	json.Unmarshal([]byte(result.Raw), reciveMsg)
 
@@ -38,10 +39,10 @@ func sendRandomR18IllustToGroup(result gjson.Result) {
 	sendMsg.Params.GroupID = reciveMsg.GroupID
 	sendMsg.Params.Message = fmt.Sprintf("[CQ:image,file=%s]", fileURL)
 
-	WebSocketServer.SendJSON(sendMsg)
+	WebSocketServer.SendJSON(conn, sendMsg)
 }
 
-func sendRandomR18IllustToPrivate(result gjson.Result) {
+func sendRandomR18IllustToPrivate(conn *websocket.Conn, result gjson.Result) {
 	reciveMsg := &RecivePrivateMessageObject{}
 	json.Unmarshal([]byte(result.Raw), reciveMsg)
 
@@ -54,5 +55,5 @@ func sendRandomR18IllustToPrivate(result gjson.Result) {
 	sendMsg.Params.UserID = reciveMsg.UserID
 	sendMsg.Params.Message = fmt.Sprintf("[CQ:image,file=%s]", fileURL)
 
-	WebSocketServer.SendJSON(sendMsg)
+	WebSocketServer.SendJSON(conn, sendMsg)
 }

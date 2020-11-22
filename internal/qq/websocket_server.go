@@ -12,19 +12,16 @@ import (
 )
 
 type websocketServer struct {
-	token string
-	conn  *websocket.Conn
-
-	privateMessageHandler map[string]func(gjson.Result)
-	groupMessageHandler   map[string]func(gjson.Result)
+	token                 string
+	privateMessageHandler map[string]func(*websocket.Conn, gjson.Result)
+	groupMessageHandler   map[string]func(*websocket.Conn, gjson.Result)
 }
 
 // WebSocketServer Singleton
 var WebSocketServer = &websocketServer{
 	token:                 os.Getenv("WEBSOCKET_SERVER_TOKEN"),
-	conn:                  nil,
-	privateMessageHandler: map[string]func(gjson.Result){},
-	groupMessageHandler:   map[string]func(gjson.Result){},
+	privateMessageHandler: map[string]func(*websocket.Conn, gjson.Result){},
+	groupMessageHandler:   map[string]func(*websocket.Conn, gjson.Result){},
 }
 
 var upgrader = websocket.Upgrader{
@@ -40,21 +37,21 @@ func (s *websocketServer) Run(addr, authToken string) {
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
-func (s *websocketServer) HandlePrivateMessageFunc(keyword string, handler func(gjson.Result)) {
+func (s *websocketServer) HandlePrivateMessageFunc(keyword string, handler func(*websocket.Conn, gjson.Result)) {
 	s.privateMessageHandler[keyword] = handler
 }
 
-func (s *websocketServer) HandleGroupMessageFunc(keyword string, handler func(gjson.Result)) {
+func (s *websocketServer) HandleGroupMessageFunc(keyword string, handler func(*websocket.Conn, gjson.Result)) {
 	s.groupMessageHandler[keyword] = handler
 }
 
-func (s *websocketServer) SendJSON(message interface{}) {
+func (s *websocketServer) SendJSON(conn *websocket.Conn, message interface{}) {
 	log.Info("发送Json至CqHttp")
 	b, err := json.Marshal(message)
 	if err != nil {
 		log.Panic(err)
 	}
-	s.conn.WriteMessage(websocket.TextMessage, b)
+	conn.WriteMessage(websocket.TextMessage, b)
 }
 
 func (s *websocketServer) any(w http.ResponseWriter, r *http.Request) {
@@ -68,8 +65,6 @@ func (s *websocketServer) any(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Infof("接受 Websocket 连接: %v (/)", r.RemoteAddr)
-	// FIXME
-	s.conn = c
 	go s.listenEvent(c)
 }
 
@@ -94,28 +89,28 @@ func (s *websocketServer) listenEvent(conn *websocket.Conn) {
 			break
 		}
 		if t == websocket.TextMessage {
-			go s.universalHandler(gjson.ParseBytes(payload))
+			go s.universalHandler(conn, gjson.ParseBytes(payload))
 		}
 	}
 }
 
-func (s *websocketServer) universalHandler(json gjson.Result) {
+func (s *websocketServer) universalHandler(conn *websocket.Conn, json gjson.Result) {
 	switch json.Get("post_type").Str {
 	case "message":
 		log.Debug(json.String())
-		s.messageHandler(json)
+		s.messageHandler(conn, json)
 		break
 	case "notice":
 		break
 	case "request":
 		break
 	case "meta_event":
-		s.metaEventHandler(json)
+		s.metaEventHandler(conn, json)
 		break
 	}
 }
 
-func (s *websocketServer) metaEventHandler(json gjson.Result) {
+func (s *websocketServer) metaEventHandler(conn *websocket.Conn, json gjson.Result) {
 	switch json.Get("meta_event_type").Str {
 	case "lifecycle":
 		break
@@ -124,18 +119,18 @@ func (s *websocketServer) metaEventHandler(json gjson.Result) {
 	}
 }
 
-func (s *websocketServer) messageHandler(json gjson.Result) {
+func (s *websocketServer) messageHandler(conn *websocket.Conn, json gjson.Result) {
 	switch json.Get("message_type").Str {
 	case "private":
 		fn, exist := s.privateMessageHandler[json.Get("raw_message").Str]
 		if exist {
-			fn(json)
+			fn(conn, json)
 		}
 		break
 	case "group":
 		fn, exist := s.groupMessageHandler[json.Get("raw_message").Str]
 		if exist {
-			fn(json)
+			fn(conn, json)
 		}
 		break
 	}
