@@ -2,8 +2,6 @@ package services
 
 import (
 	"Asane/internal/qq"
-	"Asane/internal/yandere"
-	"fmt"
 	"strings"
 
 	"github.com/gorilla/websocket"
@@ -16,7 +14,7 @@ const (
 )
 
 var commands = map[string]func([]string) string{
-	"来点色图": makeMessageYandereRandomR18Image,
+	"来点色图": makeMessageYandereRandomR18Illust,
 }
 
 func Excute(conn *websocket.Conn, msg qq.IReciveMessageObject) {
@@ -29,20 +27,4 @@ func Excute(conn *websocket.Conn, msg qq.IReciveMessageObject) {
 		resp := msg.GetResponse(fn(slice[1:]))
 		qq.WebSocketServer.WriteTextMessage(conn, resp)
 	}
-}
-
-func makeMessageYandereRandomR18Image(params []string) string {
-	post := yandere.Client.GetRandomExplicitPost()
-	var imageURL = ""
-	if post.FileSize < 6291456 {
-		imageURL = post.FileURL
-	} else if post.JpegFileSize > 0 && post.JpegFileSize < 6291456 {
-		imageURL = post.JpegURL
-	} else if post.SampleFileSize > 0 && post.SampleFileSize < 6291456 {
-		imageURL = post.SampleURL
-	} else {
-		log.Debug("图太大了，换一张")
-		return makeMessageYandereRandomR18Image(params)
-	}
-	return fmt.Sprintf("https://yande.re/post/show/%d [CQ:image,file=%s]", post.ID, imageURL)
 }

@@ -39,7 +39,7 @@ func (c *client) GetRandomExplicitPost() YanderePostsListResponseObject {
 	yanderePostsListResponse := &[]YanderePostsListResponseObject{}
 	err = json.Unmarshal(buf.Bytes(), yanderePostsListResponse)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 	return (*yanderePostsListResponse)[0]
 }

@@ -1,3 +1,5 @@
+github.com/Comdex/imgo v0.0.0-20200213094239-bb8d436f1e5a h1:R6uoBNIHx3UyxxG+ntWSC/g9gXUIPSk1bvW9zzhIadE=
+github.com/Comdex/imgo v0.0.0-20200213094239-bb8d436f1e5a/go.mod h1:OqTmmqMJZcFVi/fGDvpvoCYxFjyFgkJ5wRU42g1bWQY=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0Ufc=
 github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=

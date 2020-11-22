@@ -79,7 +79,7 @@ func (s *websocketServer) listenEvent(conn *websocket.Conn) {
 			break
 		}
 		if t == websocket.TextMessage {
-			go s.universalRouter(conn, gjson.ParseBytes(payload))
+			s.universalRouter(conn, gjson.ParseBytes(payload))
 		}
 	}
 }
@@ -116,14 +116,14 @@ func (s *websocketServer) messageRouter(conn *websocket.Conn, result gjson.Resul
 		json.Unmarshal([]byte(result.Raw), reciveMsg)
 		var iMsg IReciveMessageObject
 		iMsg = reciveMsg
-		go s.messageHandler(conn, iMsg)
+		s.messageHandler(conn, iMsg)
 		break
 	case "group":
 		reciveMsg := &ReciveGroupMessageObject{}
 		json.Unmarshal([]byte(result.Raw), reciveMsg)
 		var iMsg IReciveMessageObject
 		iMsg = reciveMsg
-		go s.messageHandler(conn, iMsg)
+		s.messageHandler(conn, iMsg)
 		break
 	}
 }
