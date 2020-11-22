@@ -42,8 +42,8 @@ func processIllust(file string, height int, width int) {
 		height = 2000
 		raw, err = imgo.ResizeForMatrix(file, width, height)
 	} else if width > height && width > 2000 {
-		width = 2000
 		height = int(2000.0 / float64(width) * float64(height))
+		width = 2000
 		raw, err = imgo.ResizeForMatrix(file, width, height)
 	} else {
 		raw = imgo.MustRead(file)
