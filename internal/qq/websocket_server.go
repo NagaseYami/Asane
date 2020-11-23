@@ -87,7 +87,7 @@ func (s *websocketServer) listenEvent(conn *websocket.Conn) {
 func (s *websocketServer) universalRouter(conn *websocket.Conn, result gjson.Result) {
 	switch result.Get("post_type").Str {
 	case "message":
-		log.Debug(result.String())
+		log.Trace(result.String())
 		s.messageRouter(conn, result)
 		break
 	case "notice":
