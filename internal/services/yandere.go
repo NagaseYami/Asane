@@ -14,6 +14,8 @@ import (
 	"github.com/Comdex/imgo"
 )
 
+const imageSizeLimit = 2000
+
 func yandereSerchTags(params []string) string {
 	if len(params) == 0 {
 		return "请输入需要搜索的tag\n例：\nasane tag loli"
@@ -64,13 +66,14 @@ func processIllust(file string, height int, width int) {
 
 	var raw = [][][]uint8{}
 	var err error
-	if height > width && height > 2000 {
-		width = int(2000.0 / float64(height) * float64(width))
-		height = 2000
-		raw, err = imgo.ResizeForMatrix(file, width, height)
-	} else if width > height && width > 2000 {
-		height = int(2000.0 / float64(width) * float64(height))
-		width = 2000
+	if height > imageSizeLimit || width > imageSizeLimit {
+		if height >= width {
+			width = int(float64(imageSizeLimit) / float64(height) * float64(width))
+			height = imageSizeLimit
+		} else if width > height {
+			height = int(float64(imageSizeLimit) / float64(width) * float64(height))
+			width = imageSizeLimit
+		}
 		raw, err = imgo.ResizeForMatrix(file, width, height)
 	} else {
 		raw = imgo.MustRead(file)
