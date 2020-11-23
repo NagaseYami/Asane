@@ -4,6 +4,7 @@ import (
 	"Asane/internal/api/yandere"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"path"
@@ -14,7 +15,7 @@ import (
 	"github.com/Comdex/imgo"
 )
 
-const imageResolutionLimit = 4000000
+const imageResolutionLimit = 3000000
 
 func yandereSerchTags(params []string) string {
 	if len(params) == 0 {
@@ -67,13 +68,14 @@ func processIllust(file string, height int, width int) {
 	var raw = [][][]uint8{}
 	var err error
 	if resolution := height * width; resolution > imageResolutionLimit {
-
-		scale := float64(imageResolutionLimit) / float64(resolution)
+		log.Tracef("图片需要压缩（当前分辨率：%d=%d*%d）", resolution, height, width)
+		scale := math.Sqrt(float64(imageResolutionLimit) / float64(resolution))
 
 		height = int(float64(height) * scale)
 		width = int(float64(width) * scale)
 
 		raw, err = imgo.ResizeForMatrix(file, width, height)
+		log.Tracef("压缩完毕（压缩后分辨率：%d=%d*%d）", height*width, height, width)
 	} else {
 		raw = imgo.MustRead(file)
 	}
