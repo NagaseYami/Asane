@@ -19,7 +19,7 @@ func yandereSerchTags(params []string) string {
 		return "请输入需要搜索的tag\n例：\nasane tag loli"
 	}
 
-	result, err := yandere.Instance.SearchTags(params[0])
+	result, err := yandere.Client.SearchTags(params[0])
 
 	if err != nil {
 		return err.Error()
@@ -37,7 +37,7 @@ func yandereRandomR18Illust(params []string) string {
 	if len(params) > 4 {
 		params = params[:3]
 	}
-	post, err := yandere.Instance.GetRandomExplicitPost(params)
+	post, err := yandere.Client.GetRandomExplicitPost(params)
 	if err != nil {
 		return err.Error()
 	}
