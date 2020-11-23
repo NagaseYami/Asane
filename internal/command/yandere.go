@@ -1,7 +1,7 @@
-package services
+package command
 
 import (
-	"Asane/internal/yandere"
+	"Asane/internal/api/yandere"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,7 +14,7 @@ import (
 	"github.com/Comdex/imgo"
 )
 
-func makeMessageYandereSerchTags(params []string) string {
+func yandereSerchTags(params []string) string {
 	if len(params) == 0 {
 		return "请输入需要搜索的tag\n例：\nasane tag loli"
 	}
@@ -33,7 +33,7 @@ func makeMessageYandereSerchTags(params []string) string {
 	return fmt.Sprintf("搜索结果：\n%s", strings.Join(str, "\n"))
 }
 
-func makeMessageYandereRandomR18Illust(params []string) string {
+func yandereRandomR18Illust(params []string) string {
 	if len(params) > 4 {
 		params = params[:3]
 	}

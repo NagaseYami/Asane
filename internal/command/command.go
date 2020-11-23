@@ -1,4 +1,4 @@
-package services
+package command
 
 import (
 	"Asane/internal/qq"
@@ -14,8 +14,8 @@ const (
 )
 
 var commands = map[string]func([]string) string{
-	"eroe": makeMessageYandereRandomR18Illust,
-	"tag":  makeMessageYandereSerchTags,
+	"eroe": yandereRandomR18Illust,
+	"tag":  yandereSerchTags,
 }
 
 func Excute(conn *websocket.Conn, msg qq.IReciveMessageObject) {
