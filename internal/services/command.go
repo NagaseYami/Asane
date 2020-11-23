@@ -15,6 +15,7 @@ const (
 var commands = map[string]func([]string) string{
 	"eroe": yandereRandomR18Illust,
 	"tag":  yandereSerchTags,
+	"apod": nasaAPOD,
 }
 
 // Excute 尝试执行QQ消息中含有的命令

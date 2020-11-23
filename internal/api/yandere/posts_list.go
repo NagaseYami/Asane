@@ -63,7 +63,7 @@ type PostsListRequestQueryObject struct {
 
 // URL Get API URL
 func (api *PostsListRequestQueryObject) URL() *url.URL {
-	result := yandereURL
+	result := apiURL
 	result.Path = path.Join(result.Path, "post.json")
 	query := result.Query()
 

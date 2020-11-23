@@ -37,7 +37,7 @@ func yandereRandomR18Illust(params []string) string {
 	if len(params) > 4 {
 		params = params[:3]
 	}
-	post, err := yandere.Client.GetRandomExplicitPost(params)
+	post, err := yandere.Client.RandomExplicitPost(params)
 	if err != nil {
 		return err.Error()
 	}
@@ -51,7 +51,7 @@ func yandereRandomR18Illust(params []string) string {
 
 	err = downloadFile(post.JpegURL, imagePath)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 	processIllust(imagePath, post.JpegHeight, post.JpegWidth)
 
@@ -77,7 +77,7 @@ func processIllust(file string, height int, width int) {
 	}
 
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 
 	triple := imgo.NewRGBAMatrix(height*2, width)
@@ -99,7 +99,7 @@ func processIllust(file string, height int, width int) {
 
 	err = imgo.SaveAsJPEG(file, triple, 80)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 }
 

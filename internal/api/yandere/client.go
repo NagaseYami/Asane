@@ -14,7 +14,7 @@ import (
 
 type client struct{}
 
-var yandereURL = url.URL{
+var apiURL = url.URL{
 	Scheme: "https",
 	Host:   "yande.re",
 }
@@ -30,7 +30,7 @@ func (c *client) SearchTags(tag string) ([]TagListResponseObject, error) {
 	}
 	resp, err := http.Get(api.URL().String())
 	if err != nil {
-		log.Warnln()
+		log.Error(err)
 	}
 	defer resp.Body.Close()
 
@@ -40,7 +40,7 @@ func (c *client) SearchTags(tag string) ([]TagListResponseObject, error) {
 	result := &[]TagListResponseObject{}
 	err = json.Unmarshal(buf.Bytes(), result)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 
 	if len(*result) == 0 {
@@ -50,7 +50,7 @@ func (c *client) SearchTags(tag string) ([]TagListResponseObject, error) {
 	return (*result), nil
 }
 
-func (c *client) GetRandomExplicitPost(tags []string) (PostsListResponseObject, error) {
+func (c *client) RandomExplicitPost(tags []string) (PostsListResponseObject, error) {
 	if tags == nil {
 		tags = []string{}
 	}
@@ -64,7 +64,7 @@ func (c *client) GetRandomExplicitPost(tags []string) (PostsListResponseObject, 
 	}
 	resp, err := http.Get(api.URL().String())
 	if err != nil {
-		log.Warnln(err)
+		log.Error(err)
 	}
 	defer resp.Body.Close()
 
@@ -74,7 +74,7 @@ func (c *client) GetRandomExplicitPost(tags []string) (PostsListResponseObject, 
 	postsListResponse := &[]PostsListResponseObject{}
 	err = json.Unmarshal(buf.Bytes(), postsListResponse)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 	if len(*postsListResponse) == 0 {
 		return PostsListResponseObject{}, errors.New("搜索结果为0")

@@ -24,7 +24,7 @@ type TagListRequestQueryObject struct {
 
 // URL Get API URL
 func (api *TagListRequestQueryObject) URL() *url.URL {
-	result := yandereURL
+	result := apiURL
 	result.Path = path.Join(result.Path, "tag.json")
 	query := result.Query()
 
