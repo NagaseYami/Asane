@@ -22,13 +22,13 @@ var yandereURL = url.URL{
 // Client YandereClient单例
 var Client = &client{}
 
-func (c *client) SearchTags(tag string) ([]YandereTagsListResponseObject, error) {
-	api := &YandereTagsListApi{
+func (c *client) SearchTags(tag string) ([]TagListResponseObject, error) {
+	api := &TagListRequestQueryObject{
 		Limit: 10,
 		Name:  tag,
 		Order: "count",
 	}
-	resp, err := http.Get(api.GetURL().String())
+	resp, err := http.Get(api.URL().String())
 	if err != nil {
 		log.Warnln()
 	}
@@ -37,20 +37,20 @@ func (c *client) SearchTags(tag string) ([]YandereTagsListResponseObject, error)
 	buf := new(bytes.Buffer)
 	io.Copy(buf, resp.Body)
 
-	result := &[]YandereTagsListResponseObject{}
+	result := &[]TagListResponseObject{}
 	err = json.Unmarshal(buf.Bytes(), result)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	if len(*result) == 0 {
-		return []YandereTagsListResponseObject{}, errors.New("搜索结果为0")
+		return []TagListResponseObject{}, errors.New("搜索结果为0")
 	}
 
 	return (*result), nil
 }
 
-func (c *client) GetRandomExplicitPost(tags []string) (YanderePostsListResponseObject, error) {
+func (c *client) GetRandomExplicitPost(tags []string) (PostsListResponseObject, error) {
 	if tags == nil {
 		tags = []string{}
 	}
@@ -58,11 +58,11 @@ func (c *client) GetRandomExplicitPost(tags []string) (YanderePostsListResponseO
 	tags = append(tags, "rating:explicit")
 	tags = append(tags, "order:random")
 
-	api := &YanderePostsListApi{
+	api := &PostsListRequestQueryObject{
 		Limit: 1,
 		Tags:  strings.Join(tags, " "),
 	}
-	resp, err := http.Get(api.GetURL().String())
+	resp, err := http.Get(api.URL().String())
 	if err != nil {
 		log.Warnln(err)
 	}
@@ -71,13 +71,13 @@ func (c *client) GetRandomExplicitPost(tags []string) (YanderePostsListResponseO
 	buf := new(bytes.Buffer)
 	io.Copy(buf, resp.Body)
 
-	yanderePostsListResponse := &[]YanderePostsListResponseObject{}
-	err = json.Unmarshal(buf.Bytes(), yanderePostsListResponse)
+	postsListResponse := &[]PostsListResponseObject{}
+	err = json.Unmarshal(buf.Bytes(), postsListResponse)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if len(*yanderePostsListResponse) == 0 {
-		return YanderePostsListResponseObject{}, errors.New("搜索结果为0")
+	if len(*postsListResponse) == 0 {
+		return PostsListResponseObject{}, errors.New("搜索结果为0")
 	}
-	return (*yanderePostsListResponse)[0], nil
+	return (*postsListResponse)[0], nil
 }

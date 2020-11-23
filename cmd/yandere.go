@@ -1,4 +1,4 @@
-package command
+package main
 
 import (
 	"Asane/internal/api/yandere"

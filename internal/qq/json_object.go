@@ -6,10 +6,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// IReciveMessageObject 收到的任意来源的消息
 type IReciveMessageObject interface {
 	GetSelfID() int64
-	GetRaw() string
-	GetResponse(string) []byte
+	GetRawMessage() string
+	Bytes(string) []byte
 }
 
 // LifecycleObject 元事件：生命周期
@@ -52,15 +53,18 @@ type RecivePrivateMessageObject struct {
 	UserID  int64  `json:"user_id"`
 }
 
+// GetSelfID SelfID
 func (obj *RecivePrivateMessageObject) GetSelfID() int64 {
 	return obj.SelfID
 }
 
-func (obj *RecivePrivateMessageObject) GetRaw() string {
+// GetRawMessage RawMessage
+func (obj *RecivePrivateMessageObject) GetRawMessage() string {
 	return obj.RawMessage
 }
 
-func (obj *RecivePrivateMessageObject) GetResponse(msg string) []byte {
+// Bytes 生成返回给Cqhttp的bytes
+func (obj *RecivePrivateMessageObject) Bytes(msg string) []byte {
 	sendMsg := SendPrivateMessageObject{}
 	sendMsg.Action = "send_private_msg"
 	sendMsg.Params.UserID = obj.UserID
@@ -115,15 +119,18 @@ type ReciveGroupMessageObject struct {
 	UserID  int64  `json:"user_id"`
 }
 
+// GetSelfID SelfID
 func (obj *ReciveGroupMessageObject) GetSelfID() int64 {
 	return obj.SelfID
 }
 
-func (obj *ReciveGroupMessageObject) GetRaw() string {
+// GetRawMessage RawMessage
+func (obj *ReciveGroupMessageObject) GetRawMessage() string {
 	return obj.RawMessage
 }
 
-func (obj *ReciveGroupMessageObject) GetResponse(msg string) []byte {
+// Bytes 生成返回给Cqhttp的bytes
+func (obj *ReciveGroupMessageObject) Bytes(msg string) []byte {
 	sendMsg := SendGroupMessageObject{}
 	sendMsg.Action = "send_group_msg"
 	sendMsg.Params.GroupID = obj.GroupID

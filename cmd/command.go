@@ -1,4 +1,4 @@
-package command
+package main
 
 import (
 	"Asane/internal/qq"
@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	delimiter   = " "
 	baseCommand = "asane"
 )
 
@@ -18,8 +17,8 @@ var commands = map[string]func([]string) string{
 	"tag":  yandereSerchTags,
 }
 
-func Excute(conn *websocket.Conn, msg qq.IReciveMessageObject) {
-	slice := strings.Split(msg.GetRaw(), delimiter)
+func excuteCommand(conn *websocket.Conn, msg qq.IReciveMessageObject) {
+	slice := strings.Split(msg.GetRawMessage(), " ")
 	if len(slice) < 2 || slice[0] != baseCommand {
 		return
 	}
@@ -28,9 +27,9 @@ func Excute(conn *websocket.Conn, msg qq.IReciveMessageObject) {
 
 		resp := []byte{}
 		if len(slice) > 2 {
-			resp = msg.GetResponse(fn(slice[2:]))
+			resp = msg.Bytes(fn(slice[2:]))
 		} else {
-			resp = msg.GetResponse(fn([]string{}))
+			resp = msg.Bytes(fn([]string{}))
 		}
 
 		qq.WebSocketServer.WriteTextMessage(conn, resp)

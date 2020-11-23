@@ -6,7 +6,8 @@ import (
 	"strconv"
 )
 
-type YanderePostsListResponseObject struct {
+// PostsListResponseObject PostList Response
+type PostsListResponseObject struct {
 	ID                  int           `json:"id"`
 	Tags                string        `json:"tags"`
 	CreatedAt           int           `json:"created_at"`
@@ -53,13 +54,15 @@ type YanderePostsListResponseObject struct {
 	LastCommentedAt     int           `json:"last_commented_at"`
 }
 
-type YanderePostsListApi struct {
+// PostsListRequestQueryObject PostsList Request Query
+type PostsListRequestQueryObject struct {
 	Limit int
 	Page  int
 	Tags  string
 }
 
-func (api *YanderePostsListApi) GetURL() *url.URL {
+// URL Get API URL
+func (api *PostsListRequestQueryObject) URL() *url.URL {
 	result := yandereURL
 	result.Path = path.Join(result.Path, "post.json")
 	query := result.Query()

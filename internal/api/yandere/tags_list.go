@@ -6,7 +6,8 @@ import (
 	"strconv"
 )
 
-type YandereTagsListResponseObject struct {
+// TagListResponseObject TagList Response
+type TagListResponseObject struct {
 	ID        int    `json:"id"`
 	Name      string `json:"name"`
 	Count     int    `json:"count"`
@@ -14,13 +15,15 @@ type YandereTagsListResponseObject struct {
 	Ambiguous bool   `json:"ambiguous"`
 }
 
-type YandereTagsListApi struct {
+// TagListRequestQueryObject TagList Request Query
+type TagListRequestQueryObject struct {
 	Limit int
 	Order string
 	Name  string
 }
 
-func (api *YandereTagsListApi) GetURL() *url.URL {
+// URL Get API URL
+func (api *TagListRequestQueryObject) URL() *url.URL {
 	result := yandereURL
 	result.Path = path.Join(result.Path, "tag.json")
 	query := result.Query()
