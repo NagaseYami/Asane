@@ -14,7 +14,7 @@ import (
 	"github.com/Comdex/imgo"
 )
 
-const imageSizeLimit = 2000
+const imageResolutionLimit = 4000000
 
 func yandereSerchTags(params []string) string {
 	if len(params) == 0 {
@@ -66,14 +66,13 @@ func processIllust(file string, height int, width int) {
 
 	var raw = [][][]uint8{}
 	var err error
-	if height > imageSizeLimit || width > imageSizeLimit {
-		if height >= width {
-			width = int(float64(imageSizeLimit) / float64(height) * float64(width))
-			height = imageSizeLimit
-		} else if width > height {
-			height = int(float64(imageSizeLimit) / float64(width) * float64(height))
-			width = imageSizeLimit
-		}
+	if resolution := height * width; resolution > imageResolutionLimit {
+
+		scale := float64(imageResolutionLimit) / float64(resolution)
+
+		height = int(float64(height) * scale)
+		width = int(float64(width) * scale)
+
 		raw, err = imgo.ResizeForMatrix(file, width, height)
 	} else {
 		raw = imgo.MustRead(file)
