@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"math/rand"
 	"net/http"
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -16,6 +18,7 @@ import (
 )
 
 const imageResolutionLimit = 3000000
+const noise = 300
 
 func yandereSerchTags(params []string) string {
 	if len(params) == 0 {
@@ -84,30 +87,28 @@ func processIllust(file string, height int, width int) {
 		log.Error(err)
 	}
 
-	triple := imgo.NewRGBAMatrix(height*3, width)
+	newHeight := height + noise
+	newWidth := width + noise
+	newImage := imgo.NewRGBAMatrix(newHeight, newWidth)
 
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
-			triple[i][j] = raw[i-i%20][j-j%20]
+	log.Trace("添加噪点")
+	halfNoise := noise / 2
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < newHeight; i++ {
+		for j := 0; j < newWidth; j++ {
+			if i >= halfNoise && i < halfNoise+height && j >= halfNoise && j < halfNoise+width {
+				newImage[i][j] = raw[i-halfNoise][j-halfNoise]
+			} else {
+				newImage[i][j][0] = uint8(rand.Intn(255))
+				newImage[i][j][1] = uint8(rand.Intn(255))
+				newImage[i][j][2] = uint8(rand.Intn(255))
+				newImage[i][j][3] = uint8(255)
+			}
 		}
 	}
+	log.Trace("添加噪点完毕")
 
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
-			triple[i+height][j][0] = 255 - raw[i][j][0]
-			triple[i+height][j][1] = 255 - raw[i][j][1]
-			triple[i+height][j][2] = 255 - raw[i][j][2]
-			triple[i+height][j][3] = 255
-		}
-	}
-
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
-			triple[i+height*2][j] = raw[i][j]
-		}
-	}
-
-	err = imgo.SaveAsJPEG(file, triple, 80)
+	err = imgo.SaveAsJPEG(file, newImage, 80)
 	if err != nil {
 		log.Error(err)
 	}
