@@ -1,4 +1,4 @@
-package command
+package services
 
 import (
 	"Asane/internal/qq"
