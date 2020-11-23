@@ -83,20 +83,26 @@ func processIllust(file string, height int, width int) {
 		log.Error(err)
 	}
 
-	triple := imgo.NewRGBAMatrix(height*2, width)
+	triple := imgo.NewRGBAMatrix(height*3, width)
 
 	for i := 0; i < height; i++ {
 		for j := 0; j < width; j++ {
-			triple[i][j][0] = 255 - raw[i][j][0]
-			triple[i][j][1] = 255 - raw[i][j][1]
-			triple[i][j][2] = 255 - raw[i][j][2]
-			triple[i][j][3] = 255
+			triple[i][j] = raw[i-i%20][j-j%20]
 		}
 	}
 
 	for i := 0; i < height; i++ {
 		for j := 0; j < width; j++ {
-			triple[i+height][j] = raw[i][j]
+			triple[i+height][j][0] = 255 - raw[i][j][0]
+			triple[i+height][j][1] = 255 - raw[i][j][1]
+			triple[i+height][j][2] = 255 - raw[i][j][2]
+			triple[i+height][j][3] = 255
+		}
+	}
+
+	for i := 0; i < height; i++ {
+		for j := 0; j < width; j++ {
+			triple[i+height*2][j] = raw[i][j]
 		}
 	}
 
