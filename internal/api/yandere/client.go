@@ -12,17 +12,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type client struct{}
+type instance struct{}
 
 var yandereURL = url.URL{
 	Scheme: "https",
 	Host:   "yande.re",
 }
 
-// Client YandereClient单例
-var Client = &client{}
+// Instance 单例
+var Instance = &instance{}
 
-func (c *client) SearchTags(tag string) ([]TagListResponseObject, error) {
+func (c *instance) SearchTags(tag string) ([]TagListResponseObject, error) {
 	api := &TagListRequestQueryObject{
 		Limit: 10,
 		Name:  tag,
@@ -50,7 +50,7 @@ func (c *client) SearchTags(tag string) ([]TagListResponseObject, error) {
 	return (*result), nil
 }
 
-func (c *client) GetRandomExplicitPost(tags []string) (PostsListResponseObject, error) {
+func (c *instance) GetRandomExplicitPost(tags []string) (PostsListResponseObject, error) {
 	if tags == nil {
 		tags = []string{}
 	}
