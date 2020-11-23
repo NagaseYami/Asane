@@ -1,4 +1,4 @@
-package main
+package command
 
 import (
 	"Asane/internal/qq"
@@ -17,7 +17,8 @@ var commands = map[string]func([]string) string{
 	"tag":  yandereSerchTags,
 }
 
-func excuteCommand(conn *websocket.Conn, msg qq.IReciveMessageObject) {
+// Excute 尝试执行QQ消息中含有的命令
+func Excute(conn *websocket.Conn, msg qq.IReciveMessageObject) {
 	slice := strings.Split(msg.GetRawMessage(), " ")
 	if len(slice) < 2 || slice[0] != baseCommand {
 		return

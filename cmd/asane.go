@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Asane/internal/command"
 	"Asane/internal/qq"
 	"os"
 
@@ -15,6 +16,6 @@ func main() {
 		log.Fatal("缺少环境变量WEBSOCKET_SERVER_ADDR")
 	}
 
-	qq.WebSocketServer.HandleMessage(excuteCommand)
+	qq.WebSocketServer.HandleMessage(command.Excute)
 	qq.WebSocketServer.Run(addr, os.Getenv("WEBSOCKET_SERVER_TOKEN"))
 }
