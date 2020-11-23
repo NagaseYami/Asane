@@ -10,11 +10,12 @@ import (
 
 const (
 	delimiter   = " "
-	baseCommand = "Asane"
+	baseCommand = "asane"
 )
 
 var commands = map[string]func([]string) string{
-	"来点色图": makeMessageYandereRandomR18Illust,
+	"eroe": makeMessageYandereRandomR18Illust,
+	"tag":  makeMessageYandereSerchTags,
 }
 
 func Excute(conn *websocket.Conn, msg qq.IReciveMessageObject) {
@@ -23,8 +24,15 @@ func Excute(conn *websocket.Conn, msg qq.IReciveMessageObject) {
 		return
 	}
 	if fn, ok := commands[slice[1]]; ok {
-		log.Infof("收到命令：%s", slice[1])
-		resp := msg.GetResponse(fn(slice[1:]))
+		log.Infof("收到命令：%s", strings.Join(slice[1:], " "))
+
+		resp := []byte{}
+		if len(slice) > 2 {
+			resp = msg.GetResponse(fn(slice[2:]))
+		} else {
+			resp = msg.GetResponse(fn([]string{}))
+		}
+
 		qq.WebSocketServer.WriteTextMessage(conn, resp)
 	}
 }
