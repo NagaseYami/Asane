@@ -18,6 +18,7 @@ import (
 )
 
 const imageResolutionLimit = 3000000
+const qqGroupImageWidthMax = 1280
 const noise = 300
 
 func yandereSerchTags(params []string) string {
@@ -70,8 +71,14 @@ func processIllust(file string, height int, width int) {
 
 	var raw = [][][]uint8{}
 	var err error
-	if resolution := height * width; resolution > imageResolutionLimit {
-		log.Tracef("图片需要压缩（当前分辨率：%d=%d*%d）", resolution, height, width)
+	if width > qqGroupImageWidthMax {
+		log.Tracef("图片宽度超过QQ压图阈值，需要压缩（当前分辨率：%d=%d*%d）", height*width, height, width)
+		height = int(float64(qqGroupImageWidthMax) / float64(width) * float64(height))
+		width = qqGroupImageWidthMax
+		raw, err = imgo.ResizeForMatrix(file, width, height)
+		log.Tracef("压缩完毕（压缩后分辨率：%d=%d*%d）", height*width, height, width)
+	} else if resolution := height * width; resolution > imageResolutionLimit {
+		log.Tracef("图片分辨率太大，需要压缩（当前分辨率：%d=%d*%d）", resolution, height, width)
 		scale := math.Sqrt(float64(imageResolutionLimit) / float64(resolution))
 
 		height = int(float64(height) * scale)
@@ -88,22 +95,34 @@ func processIllust(file string, height int, width int) {
 	}
 
 	newHeight := height + noise
-	newWidth := width + noise
-	newImage := imgo.NewRGBAMatrix(newHeight, newWidth)
+	newImage := imgo.NewRGBAMatrix(newHeight, width)
+
+	log.Trace("复制像素")
+	halfNoise := noise / 2
+
+	for i := 0; i < height; i++ {
+		for j := 0; j < width; j++ {
+			newImage[i+halfNoise][j] = raw[i][j]
+		}
+	}
+	log.Trace("复制完毕")
 
 	log.Trace("添加噪点")
-	halfNoise := noise / 2
 	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < newHeight; i++ {
-		for j := 0; j < newWidth; j++ {
-			if i >= halfNoise && i < halfNoise+height && j >= halfNoise && j < halfNoise+width {
-				newImage[i][j] = raw[i-halfNoise][j-halfNoise]
-			} else {
-				newImage[i][j][0] = uint8(rand.Intn(255))
-				newImage[i][j][1] = uint8(rand.Intn(255))
-				newImage[i][j][2] = uint8(rand.Intn(255))
-				newImage[i][j][3] = uint8(255)
-			}
+	for i := 0; i < halfNoise; i++ {
+		for j := 0; j < width; j++ {
+			newImage[i][j][0] = uint8(rand.Intn(255))
+			newImage[i][j][1] = uint8(rand.Intn(255))
+			newImage[i][j][2] = uint8(rand.Intn(255))
+			newImage[i][j][3] = uint8(255)
+		}
+	}
+	for i := 0; i < halfNoise; i++ {
+		for j := 0; j < width; j++ {
+			newImage[i+halfNoise+height][j][0] = uint8(rand.Intn(255))
+			newImage[i+halfNoise+height][j][1] = uint8(rand.Intn(255))
+			newImage[i+halfNoise+height][j][2] = uint8(rand.Intn(255))
+			newImage[i+halfNoise+height][j][3] = uint8(255)
 		}
 	}
 	log.Trace("添加噪点完毕")
