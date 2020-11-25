@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"regexp"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -32,10 +31,6 @@ var Client = &client{
 func (c *client) APOD(date string) (APODResponseObject, error) {
 	if c.APIKey == "" {
 		return APODResponseObject{}, errors.New("缺少环境变量NASA_API_KEY，该功能无法使用")
-	}
-
-	if match, _ := regexp.Match("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]", []byte(date)); !match {
-		date = ""
 	}
 
 	api := &APODRequestQueryObject{
