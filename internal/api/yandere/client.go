@@ -77,7 +77,7 @@ func (c *client) RandomExplicitPost(tags []string) (PostsListResponseObject, err
 		log.Error(err)
 	}
 	if len(*postsListResponse) == 0 {
-		return PostsListResponseObject{}, errors.New("搜索结果为0")
+		return PostsListResponseObject{}, errors.New("搜索结果为0\n本功能仅支持精准tag搜索\n请确认您输入的tag拼写正确\n您可以使用asane tag命令来搜索tag")
 	}
 	return (*postsListResponse)[0], nil
 }
