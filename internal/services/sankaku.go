@@ -1,7 +1,7 @@
 package services
 
 import (
-	"Asane/internal/api/yandere"
+	"Asane/internal/api/sankaku"
 	"fmt"
 	"os"
 	"path"
@@ -10,12 +10,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func yandereSerchTags(params []string) string {
+func sankakuSerchTags(params []string) string {
 	if len(params) == 0 {
 		return "请输入需要搜索的tag\n例：\nasane tag loli"
 	}
 
-	result, err := yandere.Client.SearchTags(params[0])
+	result, err := sankaku.Client.SearchTags(params[0])
 
 	if err != nil {
 		return err.Error()
@@ -29,27 +29,27 @@ func yandereSerchTags(params []string) string {
 	return fmt.Sprintf("搜索结果：\n%s", strings.Join(str, "\n"))
 }
 
-func yandereRandomR18Illust(params []string) string {
+func sankakuRandomR18Illust(params []string) string {
 	if len(params) > 4 {
 		params = params[:3]
 	}
-	post, err := yandere.Client.RandomExplicitPost(params)
+	post, err := sankaku.Client.RandomExplicitPost(params)
 	if err != nil {
 		return err.Error()
 	}
 
 	imageDir := ""
 	if imageDir = os.Getenv("CQHTTP_IMAGES_DIR"); imageDir == "" {
-		log.Fatal("缺少环境变量：Yandere下载文件夹")
+		log.Fatal("缺少环境变量：图片下载文件夹")
 	}
-	imageName := path.Base(post.JpegURL)
+	imageName := strings.Split(path.Base(post.SampleURL),"?")[0]
 	imagePath := path.Join(imageDir, imageName)
 
-	err = DownloadFile(post.JpegURL, imagePath)
+	err = DownloadFile(post.SampleURL, imagePath)
 	if err != nil {
 		log.Error(err)
 	}
-	ProcessIllust(imagePath, post.JpegHeight, post.JpegWidth)
+	ProcessIllust(imagePath, post.SampleHeight, post.SampleWidth)
 
-	return fmt.Sprintf("https://yande.re/post/show/%d [CQ:image,file=%s]", post.ID, imageName)
+	return fmt.Sprintf("https://chan.sankakucomplex.com/post/show/%d [CQ:image,file=%s]", post.ID, imageName)
 }
