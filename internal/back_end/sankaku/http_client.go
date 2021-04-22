@@ -1,4 +1,4 @@
-package yandere
+package sankaku
 
 import (
 	"bytes"
@@ -16,11 +16,11 @@ type client struct{}
 
 var apiURL = url.URL{
 	Scheme: "https",
-	Host:   "yande.re",
+	Host:   "capi-v2.sankakucomplex.com",
 }
 
-// Client YandereClient单例
-var Client = &client{}
+// httpClient 单例
+var httpClient = &client{}
 
 func (c *client) SearchTags(tag string) ([]TagListResponseObject, error) {
 	api := &TagListRequestQueryObject{
@@ -50,21 +50,6 @@ func (c *client) SearchTags(tag string) ([]TagListResponseObject, error) {
 	return (*result), nil
 }
 
-func (c *client) RandomSafePost(tags []string) (PostsListResponseObject, error) {
-	if tags == nil {
-		tags = []string{}
-	}
-
-	tags = append(tags, "rating:safe")
-	tags = append(tags, "order:random")
-
-	api := &PostsListRequestQueryObject{
-		Limit: 1,
-		Tags:  strings.Join(tags, " "),
-	}
-	return c.CallAPI(api)
-}
-
 func (c *client) RandomExplicitPost(tags []string) (PostsListResponseObject, error) {
 	if tags == nil {
 		tags = []string{}
@@ -77,10 +62,6 @@ func (c *client) RandomExplicitPost(tags []string) (PostsListResponseObject, err
 		Limit: 1,
 		Tags:  strings.Join(tags, " "),
 	}
-	return c.CallAPI(api)
-}
-
-func (c *client) CallAPI(api *PostsListRequestQueryObject) (PostsListResponseObject, error) {
 	resp, err := http.Get(api.URL().String())
 	if err != nil {
 		log.Error(err)

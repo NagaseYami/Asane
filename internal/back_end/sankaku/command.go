@@ -1,7 +1,7 @@
-package services
+package sankaku
 
-import (
-	"Asane/internal/api/sankaku"
+import (\
+	"Asane/internal/util"
 	"fmt"
 	"os"
 	"path"
@@ -15,7 +15,7 @@ func sankakuSerchTags(params []string) string {
 		return "请输入需要搜索的tag\n例：\nasane tag loli"
 	}
 
-	result, err := sankaku.Client.SearchTags(params[0])
+	result, err := HttpClient.SearchTags(params[0])
 
 	if err != nil {
 		return err.Error()
@@ -33,7 +33,7 @@ func sankakuRandomR18Illust(params []string) string {
 	if len(params) > 4 {
 		params = params[:3]
 	}
-	post, err := sankaku.Client.RandomExplicitPost(params)
+	post, err := HttpClient.RandomExplicitPost(params)
 	if err != nil {
 		return err.Error()
 	}
@@ -45,7 +45,7 @@ func sankakuRandomR18Illust(params []string) string {
 	imageName := strings.Split(path.Base(post.SampleURL),"?")[0]
 	imagePath := path.Join(imageDir, imageName)
 
-	err = DownloadFile(post.SampleURL, imagePath)
+	err = util.DownloadFile(post.SampleURL, imagePath)
 	if err != nil {
 		log.Error(err)
 	}

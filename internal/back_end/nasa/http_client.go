@@ -22,8 +22,8 @@ var apiURL = url.URL{
 	Host:   "api.nasa.gov",
 }
 
-// Client NASAClient单例
-var Client = &client{
+// httpClient 单例
+var httpClient = &client{
 	APIKey: os.Getenv("NASA_API_KEY"),
 }
 

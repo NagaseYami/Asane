@@ -1,8 +1,7 @@
 package main
 
 import (
-	"Asane/internal/qq"
-	"Asane/internal/services"
+	"Asane/internal/front_end/qq"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -33,6 +32,6 @@ func main() {
 		log.Fatal("缺少环境变量WEBSOCKET_SERVER_ADDR")
 	}
 
-	qq.WebSocketServer.HandleMessage(services.Excute)
+	qq.WebSocketServer.HandleMessage(Excute)
 	qq.WebSocketServer.Run(addr, os.Getenv("WEBSOCKET_SERVER_TOKEN"))
 }

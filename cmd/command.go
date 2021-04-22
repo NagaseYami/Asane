@@ -1,7 +1,9 @@
-package services
+package main
 
 import (
-	"Asane/internal/qq"
+	"Asane/internal/back_end/nasa"
+	"Asane/internal/back_end/yandere"
+	"Asane/internal/front_end/qq"
 	"strings"
 
 	"github.com/gorilla/websocket"
@@ -13,10 +15,10 @@ const (
 )
 
 var commands = map[string]func([]string) string{
-	"eroe":   yandereRandomExplicitIllust,
-	"illust": yandereRandomSafeIllust,
-	"tag":    yandereSerchTags,
-	"apod":   nasaAPOD,
+	"eroe":   yandere.YandereRandomExplicitIllust,
+	"illust": yandere.YandereRandomSafeIllust,
+	"tag":    yandere.YandereSerchTags,
+	"apod":   nasa.NasaAPOD,
 }
 
 // Excute 尝试执行QQ消息中含有的命令

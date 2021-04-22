@@ -1,12 +1,11 @@
-package services
+package nasa
 
 import (
-	"Asane/internal/api/nasa"
 	"fmt"
 	"regexp"
 )
 
-func nasaAPOD(params []string) string {
+func NasaAPOD(params []string) string {
 	date := ""
 	if len(params) > 0 {
 		date = params[0]
@@ -17,7 +16,7 @@ func nasaAPOD(params []string) string {
 		}
 	}
 
-	resp, err := nasa.Client.APOD(date)
+	resp, err := httpClient.APOD(date)
 	if err != nil {
 		return err.Error()
 	}
