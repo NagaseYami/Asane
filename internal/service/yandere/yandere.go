@@ -1,9 +1,9 @@
 package yandere
 
 import (
+	"Asane/internal/system"
 	"Asane/internal/util"
 	"fmt"
-	"os"
 	"path"
 	"strings"
 
@@ -38,12 +38,8 @@ func YandereRandomExplicitIllust(params []string) string {
 		return err.Error()
 	}
 
-	imageDir := ""
-	if imageDir = os.Getenv("CQHTTP_IMAGES_DIR"); imageDir == "" {
-		log.Fatal("缺少环境变量：Yandere下载文件夹")
-	}
 	imageName := path.Base(post.JpegURL)
-	imagePath := path.Join(imageDir, imageName)
+	imagePath := path.Join(system.ImageDirectoryPath, imageName)
 
 	err = util.DownloadFile(post.JpegURL, imagePath)
 	if err != nil {
@@ -51,7 +47,7 @@ func YandereRandomExplicitIllust(params []string) string {
 	}
 	util.ProcessIllust(imagePath, post.JpegHeight, post.JpegWidth)
 
-	return fmt.Sprintf("https://yande.re/post/show/%d [CQ:image,file=%s]", post.ID, imageName)
+	return fmt.Sprintf("[CQ:image,file=%s]\nhttps://yande.re/post/show/%d", imagePath, post.ID)
 }
 
 func YandereRandomSafeIllust(params []string) string {
@@ -63,17 +59,13 @@ func YandereRandomSafeIllust(params []string) string {
 		return err.Error()
 	}
 
-	imageDir := ""
-	if imageDir = os.Getenv("CQHTTP_IMAGES_DIR"); imageDir == "" {
-		log.Fatal("缺少环境变量：Yandere下载文件夹")
-	}
 	imageName := path.Base(post.JpegURL)
-	imagePath := path.Join(imageDir, imageName)
+	imagePath := path.Join(system.ImageDirectoryPath, imageName)
 
 	err = util.DownloadFile(post.JpegURL, imagePath)
 	if err != nil {
 		log.Error(err)
 	}
 
-	return fmt.Sprintf("https://yande.re/post/show/%d [CQ:image,file=%s]", post.ID, imageName)
+	return fmt.Sprintf("[CQ:image,file=%s]\nhttps://yande.re/post/show/%d", imagePath, post.ID)
 }

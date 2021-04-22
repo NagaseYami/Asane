@@ -12,7 +12,7 @@ func NasaAPOD(params []string) string {
 		if match, _ := regexp.Match("[0-9]{4}-[0-9]{2}-[0-9]{2}", []byte(date)); match {
 			date = params[0]
 		} else {
-			return " 日期指定格式错误。正确格式：YYYY-MM-DD"
+			return "日期指定格式错误。正确格式：YYYY-MM-DD"
 		}
 	}
 

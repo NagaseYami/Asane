@@ -1,9 +1,9 @@
 package main
 
 import (
-	"Asane/internal/back_end/nasa"
-	"Asane/internal/back_end/yandere"
-	"Asane/internal/front_end/qq"
+	"Asane/internal/server/qq"
+	"Asane/internal/service/nasa"
+	"Asane/internal/service/yandere"
 	"strings"
 
 	"github.com/gorilla/websocket"

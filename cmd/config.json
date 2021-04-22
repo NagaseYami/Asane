@@ -1,0 +1,16 @@
+{
+    "log_level": "info",
+    "media_directory_path": "Media",
+    "QQConfig": {
+        "enable": true,
+        "address": "localhost:10000",
+        "token": ""
+    },
+    "YandereConfig": {
+        "enable": true
+    },
+    "NasaConfig":{
+        "enable":true,
+        "api_key":"hPV4aG5pftEk0eMTR2fBQq5qyZ8HTkCItXS9ZdHl"
+    }
+}

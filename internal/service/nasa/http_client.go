@@ -1,14 +1,13 @@
 package nasa
 
 import (
+	"Asane/internal/system"
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
-	"os"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -24,15 +23,11 @@ var apiURL = url.URL{
 
 // httpClient 单例
 var httpClient = &client{
-	APIKey: os.Getenv("NASA_API_KEY"),
+	APIKey: system.Config.NasaConfig.APIKey,
 }
 
 // APOD NASA每日最佳图片
 func (c *client) APOD(date string) (APODResponseObject, error) {
-	if c.APIKey == "" {
-		return APODResponseObject{}, errors.New("缺少环境变量NASA_API_KEY，该功能无法使用")
-	}
-
 	api := &APODRequestQueryObject{
 		Date:   date,
 		HD:     false,

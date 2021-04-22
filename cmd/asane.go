@@ -1,37 +1,39 @@
 package main
 
 import (
-	"Asane/internal/front_end/qq"
-	"os"
+	"Asane/internal/server/qq"
+	"Asane/internal/system"
 
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	log.Print("幾重にも辛酸を舐め、七難八苦を超え、艱難辛苦の果て、満願成就に至る。")
+	log.Print("「妹の人生最大の願望は、兄と兄の彼女と3Pすることだから……」")
 
-	switch os.Getenv("LOG_LEVEL") {
-	case "Panic":
+	system.LoadConfigFile()
+	system.CreateDirectory()
+
+	switch system.Config.LogLevel {
+	case "panic":
 		log.SetLevel(log.PanicLevel)
-	case "Fatal":
+	case "fatal":
 		log.SetLevel(log.FatalLevel)
-	case "Error":
+	case "error":
 		log.SetLevel(log.ErrorLevel)
-	case "Warn":
+	case "warn":
 		log.SetLevel(log.WarnLevel)
-	case "Info":
+	case "info":
 		log.SetLevel(log.InfoLevel)
-	case "Debug":
+	case "debug":
 		log.SetLevel(log.DebugLevel)
-	case "Trace":
+	case "trace":
 		log.SetLevel(log.TraceLevel)
 	}
 
-	addr := os.Getenv("WEBSOCKET_SERVER_ADDR")
-	if addr == "" {
-		log.Fatal("缺少环境变量WEBSOCKET_SERVER_ADDR")
+	if system.Config.QQConfig.Enable {
+		qq.WebSocketServer.HandleMessage(Excute)
+		qq.WebSocketServer.Run(system.Config.QQConfig.Address, system.Config.QQConfig.Token)
 	}
 
-	qq.WebSocketServer.HandleMessage(Excute)
-	qq.WebSocketServer.Run(addr, os.Getenv("WEBSOCKET_SERVER_TOKEN"))
+	log.Print("「兄と添い寝、兄と添い寝……！文乃にはしない妹の特権はい勝ちぃ格付け完了……！」")
 }
