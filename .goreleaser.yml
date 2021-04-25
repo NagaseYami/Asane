@@ -1,0 +1,41 @@
+builds:
+  -
+    id: build
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - windows
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    goarm:
+      - 7
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+
+changelog:
+  skip: true
+
+archives:
+  - 
+    builds:
+      - build
+    format: binary
+    name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+
+release:
+  github:
+    owner: NagaseYami
+    name: asane
+  prerelease: auto
+  name_template: "{{.ProjectName}}-{{.Tag}}"
