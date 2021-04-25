@@ -1,7 +1,7 @@
 package nasa
 
 import (
-	"Asane/internal/system"
+	"github.com/NagaseYami/asane/system"
 	"bytes"
 	"encoding/json"
 	"fmt"

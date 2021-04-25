@@ -1,11 +1,12 @@
 package yandere
 
 import (
-	"Asane/internal/system"
-	"Asane/internal/util"
 	"fmt"
 	"path"
 	"strings"
+
+	"github.com/NagaseYami/asane/system"
+	"github.com/NagaseYami/asane/util"
 
 	log "github.com/sirupsen/logrus"
 )

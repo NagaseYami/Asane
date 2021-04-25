@@ -89,23 +89,23 @@ func (s *websocketServer) universalRouter(conn *websocket.Conn, result gjson.Res
 	case "message":
 		log.Trace(result.String())
 		s.messageRouter(conn, result)
-		break
+
 	case "notice":
-		break
+
 	case "request":
-		break
+
 	case "meta_event":
 		s.metaEventRouter(conn, result)
-		break
+
 	}
 }
 
 func (s *websocketServer) metaEventRouter(conn *websocket.Conn, result gjson.Result) {
 	switch result.Get("meta_event_type").Str {
 	case "lifecycle":
-		break
+
 	case "heartbeat":
-		break
+
 	}
 }
 
@@ -117,13 +117,13 @@ func (s *websocketServer) messageRouter(conn *websocket.Conn, result gjson.Resul
 		var iMsg IReciveMessageObject
 		iMsg = reciveMsg
 		s.messageHandler(conn, iMsg)
-		break
+
 	case "group":
 		reciveMsg := &ReciveGroupMessageObject{}
 		json.Unmarshal([]byte(result.Raw), reciveMsg)
 		var iMsg IReciveMessageObject
 		iMsg = reciveMsg
 		s.messageHandler(conn, iMsg)
-		break
+
 	}
 }

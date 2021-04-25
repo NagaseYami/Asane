@@ -14,3 +14,6 @@
 # VS Code
 *.code-workspace
 .vscode
+
+# Config file
+config.json
