@@ -1,6 +1,6 @@
 module github.com/NagaseYami/asane
 
-go 1.16
+go 1.16.3
 
 require (
 	github.com/Comdex/imgo v0.0.0-20200213094239-bb8d436f1e5a
