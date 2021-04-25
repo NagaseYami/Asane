@@ -1,37 +1,39 @@
 package nasa
 
 import (
-	"github.com/NagaseYami/asane/system"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
+	"regexp"
 
+	"github.com/NagaseYami/asane/system"
 	log "github.com/sirupsen/logrus"
 )
 
-type client struct {
-	APIKey string
-}
+func APOD(params []string) (APODResponseObject, error) {
+	date := ""
 
-var apiURL = url.URL{
-	Scheme: "https",
-	Host:   "api.nasa.gov",
-}
+	if len(params) > 0 {
+		date = params[0]
+		match, err := regexp.MatchString("[0-9]{4}-[0-9]{2}-[0-9]{2}", date)
+		if err != nil {
+			log.Panic(err)
+		}
 
-// httpClient 单例
-var httpClient = &client{
-	APIKey: system.Config.NasaConfig.APIKey,
-}
+		if match {
+			date = params[0]
+		} else {
+			return APODResponseObject{}, errors.New("日期指定格式错误。正确格式：YYYY-MM-DD")
+		}
+	}
 
-// APOD NASA每日最佳图片
-func (c *client) APOD(date string) (APODResponseObject, error) {
 	api := &APODRequestQueryObject{
 		Date:   date,
 		HD:     false,
-		APIKey: c.APIKey,
+		APIKey: system.Config.NasaConfig.APIKey,
 	}
 
 	resp, err := http.Get(api.URL().String())

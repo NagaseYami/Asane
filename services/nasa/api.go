@@ -6,6 +6,11 @@ import (
 	"strconv"
 )
 
+var apiURL = url.URL{
+	Scheme: "https",
+	Host:   "api.nasa.gov",
+}
+
 // APODResponseObject Nasa APOD api response
 type APODResponseObject struct {
 	Date           string `json:"date"`

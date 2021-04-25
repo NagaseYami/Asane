@@ -1,18 +1,5 @@
 package qq
 
-import (
-	"encoding/json"
-
-	log "github.com/sirupsen/logrus"
-)
-
-// IReciveMessageObject 收到的任意来源的消息
-type IReciveMessageObject interface {
-	GetSelfID() int64
-	GetRawMessage() string
-	Bytes(string) []byte
-}
-
 // LifecycleObject 元事件：生命周期
 type LifecycleObject struct {
 	MetaEventType string `json:"meta_event_type"`
@@ -51,30 +38,6 @@ type RecivePrivateMessageObject struct {
 	SubType string `json:"sub_type"`
 	Time    int64  `json:"time"`
 	UserID  int64  `json:"user_id"`
-}
-
-// GetSelfID SelfID
-func (obj *RecivePrivateMessageObject) GetSelfID() int64 {
-	return obj.SelfID
-}
-
-// GetRawMessage RawMessage
-func (obj *RecivePrivateMessageObject) GetRawMessage() string {
-	return obj.RawMessage
-}
-
-// Bytes 生成返回给Cqhttp的bytes
-func (obj *RecivePrivateMessageObject) Bytes(msg string) []byte {
-	sendMsg := SendPrivateMessageObject{}
-	sendMsg.Action = "send_private_msg"
-	sendMsg.Params.UserID = obj.UserID
-	sendMsg.Params.Message = msg
-	sendMsg.Params.AutoEscape = false
-	result, err := json.Marshal(sendMsg)
-	if err != nil {
-		log.Error(err)
-	}
-	return result
 }
 
 // SendGroupMessageObject 发送群消息
@@ -117,28 +80,4 @@ type ReciveGroupMessageObject struct {
 	SubType string `json:"sub_type"`
 	Time    int64  `json:"time"`
 	UserID  int64  `json:"user_id"`
-}
-
-// GetSelfID SelfID
-func (obj *ReciveGroupMessageObject) GetSelfID() int64 {
-	return obj.SelfID
-}
-
-// GetRawMessage RawMessage
-func (obj *ReciveGroupMessageObject) GetRawMessage() string {
-	return obj.RawMessage
-}
-
-// Bytes 生成返回给Cqhttp的bytes
-func (obj *ReciveGroupMessageObject) Bytes(msg string) []byte {
-	sendMsg := SendGroupMessageObject{}
-	sendMsg.Action = "send_group_msg"
-	sendMsg.Params.GroupID = obj.GroupID
-	sendMsg.Params.Message = msg
-	sendMsg.Params.AutoEscape = false
-	result, err := json.Marshal(sendMsg)
-	if err != nil {
-		log.Error(err)
-	}
-	return result
 }

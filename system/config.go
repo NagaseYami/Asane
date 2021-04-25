@@ -9,16 +9,12 @@ import (
 )
 
 type ConfigFile struct {
-	LogLevel string `json:"log_level"`
-	QQConfig struct {
+	BaseCommands []string `json:"base_command"`
+	LogLevel     string   `json:"log_level"`
+	QQConfig     struct {
 		Enable                    bool   `json:"enable"`
-		GoCqHttpDataDirectoryPath string `json:"go_cq_http_data_directory_path"`
 		Address                   string `json:"address"`
 		Token                     string `json:"token"`
-		DataDirectoryPath         string `json:"data_directory_path"`
-	}
-	YandereConfig struct {
-		Enable bool `json:"enable"`
 	}
 	NasaConfig struct {
 		Enable bool   `json:"enable"`
@@ -31,12 +27,13 @@ const (
 )
 
 var Config = &ConfigFile{
-	LogLevel: "info",
+	BaseCommands: []string{"asane"},
+	LogLevel:     "info",
 }
 
 func LoadConfigFile() {
 	if _, err := os.Stat(configFilePath); err != nil {
-		CreateDefaultConfigFile()
+		createDefaultConfigFile()
 		return
 	}
 	b, err := os.ReadFile(configFilePath)
@@ -51,7 +48,7 @@ func LoadConfigFile() {
 	}
 }
 
-func CreateDefaultConfigFile() {
+func createDefaultConfigFile() {
 	log.Warnln("没有检测到配置文件，生成一个空白配置文件。")
 	b, err := json.Marshal(Config)
 	if err != nil {
