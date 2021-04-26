@@ -23,6 +23,8 @@ func main() {
 		log.SetLevel(log.WarnLevel)
 	case "info":
 		log.SetLevel(log.InfoLevel)
+	case "debug":
+		log.SetLevel(log.DebugLevel)
 	case "trace":
 		log.SetLevel(log.TraceLevel)
 	}
