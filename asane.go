@@ -1,18 +1,18 @@
 package main
 
 import (
-	"github.com/NagaseYami/asane/server/qq"
+	"github.com/NagaseYami/asane/bots/qq"
 	"github.com/NagaseYami/asane/system"
 
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	log.Print("「の人生最大の願望は、兄と兄の彼女と3Pすることだから……」")
+	log.Print("「妹の人生最大の願望は、兄と兄の彼女と3Pすることだから……」")
 
 	system.LoadConfigFile()
 
-	switch system.Config.LogLevel {
+	switch system.Config.Get("log_level").String() {
 	case "panic":
 		log.SetLevel(log.PanicLevel)
 	case "fatal":
@@ -29,9 +29,8 @@ func main() {
 		log.SetLevel(log.TraceLevel)
 	}
 
-	if system.Config.QQConfig.Enable {
-		qq.Server.Init()
-		qq.Server.Run(system.Config.QQConfig.Address, system.Config.QQConfig.Token)
+	if system.Config.Get("qq_config.enable").Bool() {
+		qq.Server.Run()
 	}
 
 	log.Print("「兄と添い寝、兄と添い寝……！文乃にはしない妹の特権はい勝ちぃ格付け完了……！」")

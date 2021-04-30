@@ -1,35 +1,35 @@
 package system
 
 import (
-	"encoding/json"
+	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"os"
 
 	log "github.com/sirupsen/logrus"
 )
 
-type ConfigFile struct {
-	BaseCommands []string `json:"base_command"`
-	LogLevel     string   `json:"log_level"`
-	QQConfig     struct {
-		Enable                    bool   `json:"enable"`
-		Address                   string `json:"address"`
-		Token                     string `json:"token"`
-	}
-	NasaConfig struct {
-		Enable bool   `json:"enable"`
-		APIKey string `json:"api_key"`
-	}
-}
-
 const (
-	configFilePath = "config.json"
+	BotCommand        = "asane"
+	configFilePath    = "config.json"
+	defaultConfigJson = `{
+    "log_level": "info",
+    "qq_config": {
+        "enable": false,
+        "address": "",
+        "token": ""
+    },
+    "nasa_config": {
+        "enable": false,
+        "api_key": ""
+    },
+    "echo_config": {
+        "enable": false,
+        "trigger_times": 2
+    }
+}`
 )
 
-var Config = &ConfigFile{
-	BaseCommands: []string{"asane"},
-	LogLevel:     "info",
-}
+var Config gjson.Result
 
 func LoadConfigFile() {
 	if _, err := os.Stat(configFilePath); err != nil {
@@ -37,25 +37,13 @@ func LoadConfigFile() {
 		return
 	}
 	b, err := os.ReadFile(configFilePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = json.Unmarshal(b, Config)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	HandleError(err)
+	Config = gjson.ParseBytes(b)
 }
 
 func createDefaultConfigFile() {
 	log.Warnln("没有检测到配置文件，生成一个空白配置文件。")
-	b, err := json.Marshal(Config)
-	if err != nil {
-		log.Panic(err)
-	}
-	err = ioutil.WriteFile(configFilePath, b, 0666)
-	if err != nil {
-		log.Panic(err)
-	}
+	b := []byte(defaultConfigJson)
+	err := ioutil.WriteFile(configFilePath, b, 0666)
+	HandleError(err)
 }

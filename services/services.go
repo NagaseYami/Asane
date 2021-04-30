@@ -1,64 +1,39 @@
 package services
 
-import (
-	"fmt"
-	"regexp"
-	"strings"
+import "github.com/tidwall/gjson"
 
-	"github.com/NagaseYami/asane/services/nasa"
-	"github.com/NagaseYami/asane/system"
-)
-
-type ISession interface {
-	GetBotID() string
-	GetRawMessage() string
-	SendPictureSearchResult()
-	SendNasaAPOD(nasa.APODResponseObject, error)
-	SendHelp(string)
+type IBot interface {
+	SendNasaAPOD(string, string, gjson.Result, error)
+	SendEcho(string, string)
 }
 
-func OnRecivedMessage(session ISession) {
+type Message struct {
+	MessageID  string
+	RawMessage string
+	UserID     string
+	GroupID    string
+	Texts      []string
+	Images     []string
+}
 
-	valid, slice := Pretreatment(session.GetRawMessage(), session.GetBotID())
+type Session struct {
+	id       string
+	Bot      IBot
+	Messages []Message
+}
 
-	if !valid {
+func OnReceiveMessage(bot IBot, msg Message) {
+
+	// 复读检测
+	if Echo(msg.GroupID, msg.RawMessage) {
+		bot.SendEcho(msg.GroupID, msg.RawMessage)
 		return
-	} else if slice == nil {
-		// FIXME nagase : 返回帮助信息
+	}
+
+	if msg.Texts[0] == "apod" {
+		result, err := APOD(msg.Texts[1:])
+		bot.SendNasaAPOD(msg.UserID, msg.GroupID, result, err)
 		return
 	}
 
-	command := slice[0]
-	params := slice[1:]
-
-	switch command {
-	case "apod":
-		session.SendNasaAPOD(nasa.APOD(params))
-	}
-}
-
-func Pretreatment(raw string, botID string) (bool, []string) {
-	// QQ中有人@BOT的情况
-	str := fmt.Sprintf(`\[CQ:at,qq=%v\]`, botID)
-
-	// FIXME nagase : Discord中有人@BOT的情况
-
-	for _, value := range system.Config.BaseCommands {
-		str += fmt.Sprintf("|%v", value)
-	}
-
-	re := regexp.MustCompile(`.*?` + `(` + str + `) *`)
-	if re.MatchString(raw) {
-		return true, SliceMessage(re.ReplaceAllString(raw, ""))
-	}
-
-	return false, nil
-}
-
-func SliceMessage(msg string) []string {
-	result := strings.Split(msg, " ")
-	if len(result) == 0 {
-		return nil
-	}
-	return result
 }
