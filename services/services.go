@@ -30,7 +30,7 @@ func EchoMode(bot IBot, groupID string, rawMessage string) {
 
 func CommandMode(bot IBot, msg Message) {
 
-	if msg.Texts[0] == "apod" {
+	if len(msg.Texts) > 0 && msg.Texts[0] == "apod" {
 		result, err := APOD(msg.Texts[1:])
 		bot.SendNasaAPOD(msg.UserID, msg.GroupID, result, err)
 		return
