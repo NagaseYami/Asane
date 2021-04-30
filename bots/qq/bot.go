@@ -108,9 +108,18 @@ func (b *bot) messageRouter(result gjson.Result) {
 	switch result.Get("message_type").String() {
 	case "private":
 		// https://github.com/howmanybots/onebot/blob/master/v11/specs/event/message.md#%E7%A7%81%E8%81%8A%E6%B6%88%E6%81%AF
+		if system.Config.Get("qq_config.debug.enable").Bool() &&
+			userID != system.Config.Get("qq_config.debug.test_user_id").String() {
+			return
+		}
 	case "group":
 		// https://github.com/howmanybots/onebot/blob/master/v11/specs/event/message.md#%E7%BE%A4%E6%B6%88%E6%81%AF
 		groupID := result.Get("group_id").String()
+
+		if system.Config.Get("qq_config.debug.enable").Bool() &&
+			groupID != system.Config.Get("qq_config.debug.test_group_id").String() {
+			return
+		}
 
 		services.EchoMode(iBot, groupID, result.Get("raw_message").String())
 		if anyCall {

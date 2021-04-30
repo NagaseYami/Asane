@@ -16,7 +16,12 @@ const (
     "qq_config": {
         "enable": false,
         "address": "",
-        "token": ""
+        "token": "",
+		"debug": {
+			"enable": false,
+			"test_user_id": 0,
+			"test_group_id": 0
+		},
     },
     "nasa_config": {
         "enable": false,
