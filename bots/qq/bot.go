@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
+	"strings"
 )
 
 type bot struct {
@@ -55,7 +56,8 @@ func (b *bot) SendNasaAPOD(userID string, groupID string, apod gjson.Result, err
 }
 
 func (b *bot) SendEcho(groupID string, rawMessage string) {
-	b.sendMessage("", groupID, rawMessage)
+	msg, _ := sjson.Set(``, "params.message", rawMessage)
+	b.sendMessage("", groupID, msg)
 }
 
 func (b *bot) universalRouter(result gjson.Result) {
@@ -90,8 +92,16 @@ func (b *bot) metaEventRouter(result gjson.Result) {
 
 func (b *bot) messageRouter(result gjson.Result) {
 
+	userID := result.Get("user_id").String()
+
+	// 防止自己Call自己
+	if userID == b.id {
+		return
+	}
+
 	var message services.Message
 	var anyCall bool
+	var iBot services.IBot = b
 
 	anyCall, message.Texts, message.Images = b.messageSlicer(result.Get("message"))
 
@@ -100,19 +110,18 @@ func (b *bot) messageRouter(result gjson.Result) {
 		// https://github.com/howmanybots/onebot/blob/master/v11/specs/event/message.md#%E7%A7%81%E8%81%8A%E6%B6%88%E6%81%AF
 	case "group":
 		// https://github.com/howmanybots/onebot/blob/master/v11/specs/event/message.md#%E7%BE%A4%E6%B6%88%E6%81%AF
+		groupID := result.Get("group_id").String()
+
+		services.EchoMode(iBot, groupID, result.Get("raw_message").String())
 		if anyCall {
-			message.GroupID = result.Get("group_id").String()
+			message.GroupID = groupID
 		} else {
 			return
 		}
 	}
-
 	message.MessageID = result.Get("message_id").String()
-	message.RawMessage = result.Get("raw_message").String()
-	message.UserID = result.Get("user_id").String()
-
-	var iBot services.IBot = b
-	services.OnReceiveMessage(iBot, message)
+	message.UserID = userID
+	services.CommandMode(iBot, message)
 }
 
 func (b *bot) messageSlicer(msg gjson.Result) (bool, []string, []string) {
@@ -128,7 +137,16 @@ func (b *bot) messageSlicer(msg gjson.Result) (bool, []string, []string) {
 
 	var texts []string
 	for _, v := range msg.Get(`#(type=="text")#`).Array() {
-		texts = append(texts, v.Get(`data.text`).String())
+
+		slice := strings.Split(v.Get(`data.text`).String(), " ")
+
+		for _, s := range slice {
+			if s == system.BotCommand {
+				anyCall = true
+			} else if s != "" {
+				texts = append(texts, s)
+			}
+		}
 	}
 
 	var images []string

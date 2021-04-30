@@ -1,8 +1,9 @@
 package services
 
-import "github.com/NagaseYami/asane/system"
+import (
+	"github.com/NagaseYami/asane/system"
+)
 
-var triggerTimes = int(system.Config.Get("echo_config.trigger_times").Int())
 var groupMessageStacks = make(map[string]*messageStack)
 
 type messageStack struct {
@@ -19,6 +20,7 @@ func Echo(groupID string, rawMessage string) bool {
 	// 初始化
 	if _, ok := groupMessageStacks[groupID]; !ok {
 		ms := &messageStack{}
+		triggerTimes := int(system.Config.Get("echo_config.trigger_times").Int())
 		for i := 0; i < triggerTimes; i++ {
 			ms.messages = append(ms.messages, "")
 		}
@@ -34,17 +36,21 @@ func Echo(groupID string, rawMessage string) bool {
 
 	if !ms.lock {
 
-		for i := len(ms.messages); i > 0; i-- {
+		for i := len(ms.messages) - 1; i > 0; i-- {
 			ms.messages[i] = ms.messages[i-1]
 		}
 		ms.messages[0] = rawMessage
 
 		result := true
-		for i := 0; i < len(ms.messages)-1; i++ {
-			if ms.messages[i] != ms.messages[i+1] {
+		for i := 1; i < len(ms.messages); i++ {
+			if ms.messages[i] != ms.messages[0] {
 				result = false
 				break
 			}
+		}
+
+		if result {
+			ms.lock = true
 		}
 
 		return result

@@ -8,12 +8,11 @@ type IBot interface {
 }
 
 type Message struct {
-	MessageID  string
-	RawMessage string
-	UserID     string
-	GroupID    string
-	Texts      []string
-	Images     []string
+	MessageID string
+	UserID    string
+	GroupID   string
+	Texts     []string
+	Images    []string
 }
 
 type Session struct {
@@ -22,13 +21,14 @@ type Session struct {
 	Messages []Message
 }
 
-func OnReceiveMessage(bot IBot, msg Message) {
-
-	// 复读检测
-	if Echo(msg.GroupID, msg.RawMessage) {
-		bot.SendEcho(msg.GroupID, msg.RawMessage)
+func EchoMode(bot IBot, groupID string, rawMessage string) {
+	if Echo(groupID, rawMessage) {
+		bot.SendEcho(groupID, rawMessage)
 		return
 	}
+}
+
+func CommandMode(bot IBot, msg Message) {
 
 	if msg.Texts[0] == "apod" {
 		result, err := APOD(msg.Texts[1:])
